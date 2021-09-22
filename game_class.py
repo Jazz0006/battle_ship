@@ -1,5 +1,4 @@
 from random import randrange
-import socket
 
 class ship:
     def __init__(self, length):
@@ -158,17 +157,4 @@ class GamePlay:
             print("Hahaha, you missed.")
         print(self.my_board)
 
-my_game = GamePlay()
-print("Enemy's Board: ")
-print(my_game.opponent_board)
-print("---------------------")
-print("My Board: ")
-print(my_game.my_board)
-print("Your turn to attack:")
-target = my_game.get_hit_target()
 
-# my_game.generate_hit_target(target)
-
-my_attack = my_game.generate_hit_target()
-# my_game.game_board.update_board(target)
-# print(my_game.game_board)
