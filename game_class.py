@@ -90,7 +90,7 @@ class GameBoard:
             return True
         return False
 
-    def update_board(self, target: tuple) -> None:
+    def update_my_board(self, target: tuple) -> None:
         ''' Update the game board after receiving an attack on a block
         
         Args:
@@ -115,6 +115,15 @@ class GameBoard:
         self.board[x][y] = result_symble
         return is_hit
 
+    def update_opponent_board(self, target, hit_symble):
+        x, y = target[0], target[1]
+        self.board[x][y] = hit_symble
+
+    @property
+    def is_game_end(self):
+        return all(my_ship.sunk for my_ship in self.fleet)
+        
+
 class GamePlay:
 
     board_size = 6
@@ -132,11 +141,13 @@ class GamePlay:
         return this block.
         '''
         is_valid_target = False
+        # To do: change the algorithm, 
+        # to pick random from the set of unattacked coordinate
         while not is_valid_target:
             x = randrange(0, self.board_size)
             y = randrange(0, self.board_size)
-            target = self.game_board.board[x][y]
-            if target == "O" or target == "H":
+            target_symble = self.opponent_board.board[x][y]
+            if target_symble == "O":
                 is_valid_target = True
         return (x, y)
 
@@ -157,4 +168,10 @@ class GamePlay:
             print("Hahaha, you missed.")
         print(self.my_board)
 
+    def print_board(self):
+        print("Enemy's Board: ")
+        print(self.opponent_board)
+        print("---------------------")
+        print("My Board: ")
+        print(self.my_board)
 
