@@ -37,13 +37,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 target_cord = (int(decode_buffer[0]), int(decode_buffer[1]))
 
                 # Check attack result
-                attack_result = my_game.my_board.update_my_board(target_cord)
                 print(f" Under attack at {target_cord}")
-                if attack_result:
-                    print("Your ship was hit.\n")
-                else:
-                    print(" You are lucky, the enemy just missed.\n")
+                attack_result = my_game.gen_attack_result(target_cord)
 
+                # Print the game board
                 my_game.print_board()
 
                 # Send back the attack result
