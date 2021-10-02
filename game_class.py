@@ -160,21 +160,22 @@ class GamePlay:
  
     """
 
-    board_size = 6
+    board_size = 5
     number_of_ships = board_size - 1
 
     def __init__(self) -> None:
         self.my_board = GameBoard(self.board_size)
         self.opponent_board = GameBoard(self.board_size)
-        self.unattacked_blocks = {(x, y) for x in range(self.board_size) for y in range(self.board_size)}
+        self.unattacked_blocks = [(x, y) for x in range(self.board_size) for y in range(self.board_size)]
         
         # Deploy ships onto my game board
         self.my_board.deploy(self.number_of_ships)
 
     def generate_hit_target(self):
         ''' Randomly choose one block from all unattacked blocks '''
-
-        return self.unattacked_blocks.pop()
+        tgt = choice(self.unattacked_blocks)
+        self.unattacked_blocks.remove(tgt)
+        return tgt
 
     def get_hit_target(self):
         ''' Take user input for the coordinate of the target.'''
@@ -197,10 +198,10 @@ class GamePlay:
         """
 
         hit_result = self.my_board.update_my_board(target)
-        if hit_result:
-            print(" Your ship was hit!")   
-        else:
-            print(" You are lucky, the enemy just missed.")
+        # if hit_result:
+        #     print(" Your ship was hit!")   
+        # else:
+        #     print(" You are lucky, the enemy just missed.")
         return hit_result
 
     def print_board(self):
