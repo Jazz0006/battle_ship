@@ -2,26 +2,50 @@ from random import randrange
 from random import choice
 
 class Ship:
+    """ Class of ship that be deployed on the game board
+    
+    Attribute:
+        length (int): the length of the ship. 1 < length < length of the board
+        direction (int): 0 for horizontal;
+                         1 for vertical
+        position (list of tuple): the coordinates of the blocks the ship occupies
+        blocks (list of int): 1 -- the block is not hit
+                              0 -- the block is hit
+
+        
+    """
+
     def __init__(self, length):
         self.length = length
-        self.direction = 0 # 0 for horizental; 1 for vertical
+        self.direction = 0 # 0 for horizontal; 1 for vertical
         self.position = [(0, 0)] * length
         self.blocks = [1] * length # A list to record each block of the ship body is hit or not.
     
+    @property
+    def sunk(self):
+        """A ship sinks when all blocks are hit
+        
+        1 -- if all its blocks are hit
+        0 -- if any of its block is not hit
+        """
+
+        return not any(self.blocks)
+
     def get_hit(self, target):
-        ''' One block of the ship got hit'''
+        ''' Undates the ship if one block of it is hit
+        
+        Args:
+            target: a tuple of the coordinate on the game board
+        '''
 
         if self.direction == 0: # y1 - y0, it is the n-th block of the ship
             pos = target[1] - self.position[0][1]
         else:                   # x1 - x0
             pos = target[0] - self.position[0][0]
+        # undate that block to 0, representing it is hit
         self.blocks[pos] = 0
-        #print(self.blocks)
 
-    @property
-    def sunk(self):
-        # A ship sinks when all blocks are hit
-        return not any(self.blocks)
+
 
 class GameBoard:
     """ Class of the game board with battle ships on the board 
@@ -47,6 +71,8 @@ class GameBoard:
         self.fleet = []
 
     def __repr__(self):
+        """ presents the board as a 2-D array"""
+
         return "\n".join(" ".join(line) for line in self.board)
 
     def deploy(self, num_ship):
@@ -84,8 +110,6 @@ class GameBoard:
             else:
                 one_ship.position = [(x, start_pos_y) for x in range(start_pos_x, start_pos_x + i)]
             
-            #print(f"ship numbe {i}:")
-            #print(one_ship.position)
             self.fleet.append(one_ship)
             
             # Update the game board:
@@ -156,7 +180,8 @@ class GamePlay:
 
         my_board (obj: GameBoard): The game-board of my fleet
         opponent_board (obj: GameBoard): The game-board of the opponent
-        unattacked_blocks (set): Hold remaining blocks that unattacked
+        unattacked_blocks (list): Hold remaining blocks that unattacked
+        attacked_blocks (list): Hold all the blocks that have been manually attacked
  
     """
 
@@ -167,23 +192,52 @@ class GamePlay:
         self.my_board = GameBoard(self.board_size)
         self.opponent_board = GameBoard(self.board_size)
         self.unattacked_blocks = [(x, y) for x in range(self.board_size) for y in range(self.board_size)]
-        
+        self.attacked_blockes = [(-1, -1)]
         # Deploy ships onto my game board
         self.my_board.deploy(self.number_of_ships)
 
     def generate_hit_target(self):
         ''' Randomly choose one block from all unattacked blocks '''
+
         tgt = choice(self.unattacked_blocks)
         self.unattacked_blocks.remove(tgt)
         return tgt
 
     def get_hit_target(self):
-        ''' Take user input for the coordinate of the target.'''
+        ''' Take user input for the coordinate of the target.
 
-        print(f"Please input the row number of your attacking target: (0 to {self.board_size - 1})")
-        x = int(input())
-        print(f"Please input the colume number of your attacking target: (0 to {self.board_size - 1})")
-        y = int(input())
+        Args: 
+            None
+
+        Returns:
+            A tuple of the coordinate on the board
+
+        Raises:
+            TypeError if the input is not an integer
+        '''
+
+        x, y = -1, -1
+        while (x, y) in self.attacked_blockes:
+            x, y = -1, -1
+            while x < 0 or x > self.board_size:
+                print(f"Please input the row number of your attacking target: (0 to {self.board_size - 1})")
+                try:
+                    x = int(input())
+                except ValueError:
+                    print(f" Please input an integer between 0 and {self.board_size}")
+
+            while y < 0 or y > self.board_size:
+                print(f"Please input the colume number of your attacking target: (0 to {self.board_size - 1})")
+                try:
+                    y = int(input())
+                except ValueError:
+                    print(f" Please input an integer between 0 and {self.board_size}")
+
+            if (x, y) in self.attacked_blockes:
+                print(" You have attacked this target,")
+                print(" Please select another block.")
+        # add the new attack address to the list of attacked blocks
+        self.attacked_blockes.append((x, y))
         return (x,y)
 
     def gen_attack_result(self, target):
