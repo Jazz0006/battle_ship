@@ -4,6 +4,7 @@ import os
 
 SERVER_IP = "172.26.59.193"
 
+
 def clear_screen():
     if os.name == "posix":
         _ = os.system('clear')
@@ -14,9 +15,9 @@ if __name__ == "__main__":
     clear_screen()
     print(" Welcome to the battle ship game client.")
     print(" You will be playing with the computer.")
-    print(" You attack first and then it is the computer's turn.")
     print(" Let's start! \n")
     print(f"Connecting to the server at {SERVER_IP}")
+    print(" You can edit SERVER_IP in this file to change the setting.")
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
@@ -26,7 +27,7 @@ if __name__ == "__main__":
             print(f" Error:  Cannot connect to host: {SERVER_IP}")
             print(err)
             print("         Please check if the server app is running.")
-            print(f"         And the target IP address {SERVER_IP} is correct.\n\n")
+            print(f"         And the IP address {SERVER_IP} is correct.\n\n")
             exit(1)
 
         my_game = game_class.GamePlay()
@@ -53,7 +54,7 @@ if __name__ == "__main__":
 
             # Receive attack result
             rcv_buffer = s.recv(2)
-            if  not rcv_buffer:
+            if not rcv_buffer:
                 print(f" Error: Server's connection has lost.")
                 print("        This game is ended.")
                 break
@@ -63,7 +64,7 @@ if __name__ == "__main__":
 
             # First byte is gome over or not
             # Second byte is hit or not
-            is_game_over = rcv_buffer[0]            
+            is_game_over = rcv_buffer[0]
             you_hit = rcv_buffer[1]
 
             if you_hit == ord(b'Y'):
@@ -75,7 +76,7 @@ if __name__ == "__main__":
 
             # Update the game board
             my_game.opponent_board.update_opponent_board(target_xy, hit_result)
-            
+
             if is_game_over == ord(b'E'):
                 print(" Congratualation! You won the game!\n\n")
                 my_game.print_board()
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 
             # Receive attack
             buffer = s.recv(2)
-            if  not rcv_buffer:
+            if not rcv_buffer:
                 print(f" Error: Server's connection has lost.")
                 print("        This game is ended.")
                 break
@@ -114,7 +115,6 @@ if __name__ == "__main__":
             print("\n After this round, the game board is:")
             my_game.print_board()
 
-            if is_lost == b'E': # Game is over
+            if is_lost == b'E':  # Game is over
                 print(" Game Over, You lost.\n\n")
                 break
-    

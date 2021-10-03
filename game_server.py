@@ -1,7 +1,7 @@
 import game_class
 import socket
 import threading
-import traceback
+
 
 class ClientThread(threading.Thread):
     """ A thread for each client connection
@@ -10,7 +10,7 @@ class ClientThread(threading.Thread):
         conn: the socket connection
         addr: client IP address and port
         my_game: a instance of GamePlay class
-    
+
     """
     def __init__(self, clientAddress, clientSocket):
         threading.Thread.__init__(self)
@@ -40,11 +40,11 @@ class ClientThread(threading.Thread):
                 # Accept attack
                 print(" Info: Waiting for opponent's attack...")
                 buffer = self.conn.recv(2)
-                if  not buffer:
+                if not buffer:
                     print(f" Error: Client's connection from {self.addr} has lost.")
                     print("        This game is ended.")
                     break
-                              
+
                 decode_buffer = buffer.decode()
                 target_cord = (int(decode_buffer[0]), int(decode_buffer[1]))
 
@@ -65,7 +65,7 @@ class ClientThread(threading.Thread):
                 self.conn.sendall(is_lost + is_hit)
                 print(f" Info: Sending result to {self.addr}: {is_lost + is_hit}")
 
-                if is_lost == b'E': # Game is over
+                if is_lost == b'E':  # Game is over
                     print(" Game Over, You lost.\n\n")
                     self.conn.close()
                     break
@@ -82,7 +82,7 @@ class ClientThread(threading.Thread):
 
                 # Receive attack result
                 rcv_buffer = self.conn.recv(2)
-                if  not rcv_buffer:
+                if not rcv_buffer:
                     print(f" Error: Client's connection from {self.addr} has lost.")
                     print("        This game is ended.")
                     break
@@ -102,7 +102,7 @@ class ClientThread(threading.Thread):
                 # Update board
                 self.my_game.opponent_board.update_opponent_board(my_target, hit_result)
                 print("------End of one round-------\n\n")
-                
+
                 if is_game_over == ord(b'E'):
                     print(" Congratualation! You won the game!\n\n")
                     break
@@ -110,8 +110,6 @@ class ClientThread(threading.Thread):
         except Exception as err:
             print(" Error: Connection lost with the other player.")
             print("        Please connect again. \n\n")
-            traceback.print_exc()
-
 
 
 # Main thread to receive connection:
@@ -132,7 +130,7 @@ if __name__ == "__main__":
         try:
             s.listen()
 
-            while True:            
+            while True:
                 conn, addr = s.accept()
                 newthread = ClientThread(addr, conn)
                 newthread.start()
